@@ -39,20 +39,25 @@ router.get('/', async (req: Request, res: Response) => {
 
 // Get a feed resource
 router.get('/:id',
-    async (req: Request, res: Response) => {
-      const {id} = req.params;
-      const item = await FeedItem.findByPk(id);
-      res.send(item);
-    });
+  async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+
+    const item = await FeedItem.findByPk(id);
+
+    res.send(item);
+  });
 
 // Get a signed url to put a new item in the bucket
 router.get('/signed-url/:fileName',
-    requireAuth,
-    async (req: Request, res: Response) => {
-      const {fileName} = req.params;
-      const url = AWS.getPutSignedUrl(fileName);
-      res.status(201).send({url: url});
-    });
+  requireAuth,
+  async (req: Request<{ fileName: string }>, res: Response) => {
+
+    const { fileName } = req.params;
+
+    const url = AWS.getPutSignedUrl(fileName);
+
+    res.status(201).send({ url });
+  });
 
 // Create feed with metadata
 router.post('/',
