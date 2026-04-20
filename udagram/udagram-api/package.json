@@ -7,7 +7,7 @@
   },
   "main": "server.ts",
   "scripts": {
-    "start": "node ./server.js",
+    "start": "node ./www/server.js",
     "start:dev": "node ./www/server.js",
     "tsc": "npx tsc",
     "dev": "ts-node-dev src/server.ts --respawn --transpile-only",
