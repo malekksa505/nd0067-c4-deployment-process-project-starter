@@ -20,12 +20,6 @@ jobs:
       - run:
           name: Install Front-End Dependencies
           command: |
-            echo "Node Version:"
-            node --version
-
-            echo "NPM Version:"
-            npm --version
-
             npm run frontend:install
 
       - run:
@@ -64,26 +58,30 @@ jobs:
       - eb/setup
 
       - run:
-          name: Set Elastic Beanstalk Environment Variables
-          command: |
-            cd udagram/udagram-api
-
-            eb setenv \
-            POSTGRES_USERNAME=$POSTGRES_USERNAME \
-            POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
-            POSTGRES_DB=$POSTGRES_DB \
-            POSTGRES_HOST=$POSTGRES_HOST \
-            AWS_REGION=$AWS_REGION \
-            PORT=$PORT \
-            AWS_BUCKET=$AWS_BUCKET \
-            URL=$URL \
-            JWT_SECRET=$JWT_SECRET
-
-      - run:
           name: Deploy to Elastic Beanstalk
           command: |
             cd udagram/udagram-api
-            eb deploy
+
+            echo "Checking EB setup..."
+            ls -la .elasticbeanstalk
+
+            eb init udagram-api \
+              --region us-east-1 \
+              --platform "Node.js 22 running on 64bit Amazon Linux 2023" \
+              --quiet || true
+
+            eb setenv \
+              POSTGRES_USERNAME=$POSTGRES_USERNAME \
+              POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+              POSTGRES_DB=$POSTGRES_DB \
+              POSTGRES_HOST=$POSTGRES_HOST \
+              AWS_REGION=$AWS_REGION \
+              PORT=$PORT \
+              AWS_BUCKET=$AWS_BUCKET \
+              URL=$URL \
+              JWT_SECRET=$JWT_SECRET
+
+            eb deploy udagram-api-dev
 
 
 workflows:
