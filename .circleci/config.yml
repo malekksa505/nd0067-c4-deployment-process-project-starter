@@ -6,6 +6,7 @@ orbs:
   aws-cli: circleci/aws-cli@3.1.1
 
 jobs:
+
   build:
     docker:
       - image: cimg/node:14.15
@@ -47,41 +48,43 @@ jobs:
           command: |
             npm run api:build
 
-deploy:
-  docker:
-    - image: cimg/base:stable
 
-  steps:
-    - checkout
+  deploy:
+    docker:
+      - image: cimg/base:stable
 
-    - node/install:
-        node-version: "14.15"
+    steps:
+      - checkout
 
-    - aws-cli/setup
+      - node/install:
+          node-version: "14.15"
 
-    - eb/setup
+      - aws-cli/setup
 
-    - run:
-        name: Set Elastic Beanstalk Environment Variables
-        command: |
-          cd udagram/udagram-api
+      - eb/setup
 
-          eb setenv \
-          POSTGRES_USERNAME=$POSTGRES_USERNAME \
-          POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
-          POSTGRES_DB=$POSTGRES_DB \
-          POSTGRES_HOST=$POSTGRES_HOST \
-          AWS_REGION=$AWS_REGION \
-          PORT=$PORT \
-          AWS_BUCKET=$AWS_BUCKET \
-          URL=$URL \
-          JWT_SECRET=$JWT_SECRET
+      - run:
+          name: Set Elastic Beanstalk Environment Variables
+          command: |
+            cd udagram/udagram-api
 
-    - run:
-        name: Deploy to Elastic Beanstalk
-        command: |
-          cd udagram/udagram-api
-          eb deploy
+            eb setenv \
+            POSTGRES_USERNAME=$POSTGRES_USERNAME \
+            POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+            POSTGRES_DB=$POSTGRES_DB \
+            POSTGRES_HOST=$POSTGRES_HOST \
+            AWS_REGION=$AWS_REGION \
+            PORT=$PORT \
+            AWS_BUCKET=$AWS_BUCKET \
+            URL=$URL \
+            JWT_SECRET=$JWT_SECRET
+
+      - run:
+          name: Deploy to Elastic Beanstalk
+          command: |
+            cd udagram/udagram-api
+            eb deploy
+
 
 workflows:
   udagram:
@@ -92,7 +95,6 @@ workflows:
           type: approval
           requires:
             - build
-
           filters:
             branches:
               only:
